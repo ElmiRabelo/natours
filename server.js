@@ -1,6 +1,20 @@
+const mongoose = require('mongoose');
 const app = require('./app');
 
-const port = process.env.PORT || 3000;
+const { env } = process;
+
+const DB = env.DATABASE.replace('<PASSWORD>', env.DATABASE_PASSWORD);
+
+mongoose
+  .connect(DB, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: true,
+    useUnifiedTopology: true
+  })
+  .then(() => console.log('Database conection established'));
+
+const port = env.PORT || 3000;
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);
 });

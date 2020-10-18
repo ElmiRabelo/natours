@@ -4,7 +4,7 @@
   "description": "Natours - Project to learn Node, Express, MongoDB and API Design",
   "main": "app.js",
   "scripts": {
-    "start:dev": "nodemon server.js",
+    "dev": "nodemon server.js",
     "start:prod": "NODE_ENV=production nodemon server.js"
   },
   "author": "Elmi Rabelo",
