@@ -27,7 +27,7 @@ exports.checkBody = (req, res, next) => {
 };
 
 exports.getAllTours = (req, res) => {
-  console.log(req.requestTime);
+  console.log('Request time: ', req.requestTime);
 
   res.status(200).json({
     status: 'success',
@@ -54,8 +54,6 @@ exports.getTour = (req, res) => {
 };
 
 exports.createTour = (req, res) => {
-  // console.log(req.body);
-
   const newId = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({ id: newId }, req.body);
 
