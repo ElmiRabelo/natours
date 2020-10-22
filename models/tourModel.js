@@ -7,14 +7,23 @@ const tourSchema = new Schema({
     unique: true
   },
   duration: {
-    type: Number
+    type: Number,
+    required: [true, 'Tour must have a duration']
+  },
+  maxGroupSize: {
+    type: Number,
+    required: [true, 'Tour must have a group size']
   },
   difficulty: {
     type: String
   },
-  rating: {
+  ratingsAverage: {
     type: Number,
     default: 4.5
+  },
+  ratingsQuantity: {
+    type: Number,
+    default: 0
   },
   price: {
     type: Number,
