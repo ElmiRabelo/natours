@@ -4,6 +4,7 @@ const tourSchema = new Schema({
   name: {
     type: String,
     required: [true, 'Name must have a value'],
+    trim: true,
     unique: true
   },
   duration: {
@@ -28,7 +29,26 @@ const tourSchema = new Schema({
   price: {
     type: Number,
     required: [true, 'Tour must have a price']
-  }
+  },
+  summary: {
+    type: String,
+    require: [true, 'Tour must have a summery'],
+    trim: true
+  },
+  description: {
+    type: String,
+    trim: true
+  },
+  imageCover: {
+    type: String,
+    required: [true, 'Tour must have a cover image']
+  },
+  images: [String],
+  createdAt: {
+    type: Date,
+    default: Date.now()
+  },
+  startDates: [Date]
 });
 
 const Tour = model('Tour', tourSchema);
