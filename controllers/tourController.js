@@ -22,6 +22,13 @@ exports.getAllTours = async (req, res) => {
       query = query.sort({ _id: -1 });
     }
 
+    //field limiting
+    if (req.query.fields) {
+      query = query.select(req.query.fields.replace(/,/g, ' '));
+    } else {
+      query = query.select('-__v');
+    }
+
     // EXECUTE QUERY
     const tours = await query;
 
