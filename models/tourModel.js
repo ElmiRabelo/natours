@@ -1,10 +1,16 @@
 const { Schema, model } = require('mongoose');
+const slugify = require('slugify');
 
 const tourSchema = new Schema(
   {
     name: {
       type: String,
       required: [true, 'Name must have a value'],
+      trim: true,
+      unique: true
+    },
+    slug: {
+      type: String,
       trim: true,
       unique: true
     },
@@ -50,7 +56,11 @@ const tourSchema = new Schema(
       default: Date.now(),
       select: false
     },
-    startDates: [Date]
+    startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     toJSON: { virtuals: true },
@@ -58,13 +68,28 @@ const tourSchema = new Schema(
   }
 );
 
+// add a virtual propertie called durationWeeks everytime to every get method
 tourSchema.virtual('durationWeeks').get(function() {
   return Math.round(this.duration / 7);
 });
 
-// tourSchema.pre('save', function() {
+// DOCUMENT MIDDLEWARE - mongoose middleware, pre or post hooks
+tourSchema.pre('save', function(next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
 
-// });
+// QUERY MIDDLEWARE - this keyword refers to the query, not the object
+tourSchema.pre(/^find/, function(next) {
+  this.find({ secretTour: { $ne: true } });
+  next();
+});
+
+// AGGREGATION MIDDLEWARE
+tourSchema.pre('aggregate', function(next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  next();
+});
 
 const Tour = model('Tour', tourSchema);
 
