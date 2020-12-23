@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const { Schema, model } = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -16,11 +17,15 @@ const userSchema = new Schema({
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email']
   },
+  role: {
+    type: String,
+    enum: ['user', 'guide', 'lead-guide', 'admin'],
+    default: 'user'
+  },
   photo: String,
   password: {
     type: String,
     required: [true, 'User must provide a valid password'],
-    trim: true,
     minlength: [8, 'User password must be equal or more than 8 character'],
     select: false
   },
@@ -33,10 +38,11 @@ const userSchema = new Schema({
         return val === this.password;
       },
       message: 'Password must be the same'
-    },
-    trim: true,
-    minlength: [8, 'User password must be equal or more than 8 character']
-  }
+    }
+  },
+  passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date
 });
 
 userSchema.pre('save', async function(next) {
@@ -54,6 +60,34 @@ userSchema.methods.correctPassword = async function(
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.changesPasswordAfter = function(JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    // Verify if the password changed date occured after the token be created.
+    return JWTTimestamp < changedTimestamp;
+  }
+  // false means NOT changed
+  return false;
+};
+
+userSchema.methods.createPasswordResetToken = function() {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  this.passwordResetExpires = Date.now() + 30 * 60 * 1000;
+
+  // like password, the encrypted data stay in the db and the user it'll see the reset token unencrypted
+  return resetToken;
 };
 
 const User = model('User', userSchema);
