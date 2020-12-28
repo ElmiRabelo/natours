@@ -84,6 +84,7 @@ userSchema.methods.createPasswordResetToken = function() {
     .update(resetToken)
     .digest('hex');
 
+  // set time to 30 min
   this.passwordResetExpires = Date.now() + 30 * 60 * 1000;
 
   // like password, the encrypted data stay in the db and the user it'll see the reset token unencrypted
