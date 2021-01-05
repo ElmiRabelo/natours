@@ -46,12 +46,20 @@ const userSchema = new Schema({
 });
 
 userSchema.pre('save', async function(next) {
+  // Only run this function if password was actually modified
   if (!this.isModified('password')) return next();
-
+  // Hash the password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
-  // passwordConfirm it's used just for validation
   // be set undefined the field will not get to the database
   this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre('save', async function(next) {
+  // if new document just return next
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
