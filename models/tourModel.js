@@ -79,7 +79,32 @@ const tourSchema = new Schema(
     secretTour: {
       type: Boolean,
       default: false
-    }
+    },
+    startLocation: {
+      //GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: [Number],
+      address: String,
+      description: String
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point']
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number
+      }
+    ],
+    guides: [{ type: Schema.ObjectId, ref: 'User' }]
   },
   {
     toJSON: { virtuals: true },
@@ -98,9 +123,26 @@ tourSchema.pre('save', function(next) {
   next();
 });
 
+// EMBEDDING USERS
+// tourSchema.pre('save', async function(next) {
+//   // for each id in guides, return the User with that id;
+//   const guidesPromises = this.guides.map(async id => await User.findById(id));
+//   // guides will be a array of users;
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
+
 // QUERY MIDDLEWARE - this keyword refers to the query, not the object
 tourSchema.pre(/^find/, function(next) {
   this.find({ secretTour: { $ne: true } });
+  next();
+});
+
+tourSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v'
+  });
   next();
 });
 
