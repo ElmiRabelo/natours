@@ -117,6 +117,16 @@ tourSchema.virtual('durationWeeks').get(function() {
   return Math.round(this.duration / 7);
 });
 
+// Virtual Populate
+// This way a make a reference to data relashion that is necessary, without making mongodb store this data on the document
+// foreignField is the field on the Ref Model that refs to the actual document
+// localField is the field that has the same value of foreignField
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id'
+});
+
 // DOCUMENT MIDDLEWARE - mongoose middleware, pre or post hooks
 tourSchema.pre('save', function(next) {
   this.slug = slugify(this.name, { lower: true });

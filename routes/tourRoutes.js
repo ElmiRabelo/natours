@@ -1,10 +1,14 @@
 const express = require('express');
 const tourController = require('./../controllers/tourController');
 const authController = require('./../controllers/authController');
+const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
 
 // router.param('id', tourController.checkID);
+
+// Mounting review router to a specific endpoint on tours router, redirects to reviewRouter
+router.use('/:tourId/reviews', reviewRouter);
 
 router
   .route('/top-5-cheap')
