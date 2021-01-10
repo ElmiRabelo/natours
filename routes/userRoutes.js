@@ -17,13 +17,16 @@ router.patch(
 );
 
 //user
+router.get(
+  '/me',
+  authController.protect,
+  userController.getMe,
+  userController.getUser
+);
 router.patch('/update-me', authController.protect, userController.updateMe);
 router.patch('/delete-me', authController.protect, userController.deleteMe);
 
-router
-  .route('/')
-  .get(userController.getAllUsers)
-  .post(userController.createUser);
+router.route('/').get(userController.getAllUsers);
 
 router
   .route('/:id')
